@@ -1,3 +1,15 @@
+# Copyright (c) 2026, Creighton University
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# DISCLAIMER: This software is provided "AS IS", without warranty or guarantee
+# of any kind, express or implied, including but not limited to merchantability,
+# fitness for a particular purpose, accuracy, and non-infringement. It is NOT FIT
+# FOR ANY PURPOSE, STATED OR IMPLIED. It is a simplified educational model, not
+# intended for clinical, diagnostic, or regulatory use or for the operation of
+# any real instrument; its results may be wrong and must be independently
+# verified. In no event shall Creighton University or the contributors be liable
+# for any claim, damages, or other liability arising from its use. See LICENSE.
+
 # PyInstaller spec: a single self-contained executable, no installer.
 #
 # One-file mode is deliberate. The audience is graduate students who should be able
@@ -15,6 +27,8 @@ block_cipher = None
 
 # The component catalog is data, not code, so it has to be carried explicitly.
 datas = collect_data_files("microscopevuilder", includes=["assets/*.toml"])
+# BSD-3-Clause requires binary redistributions to carry the notice and disclaimer.
+datas.append((str(Path(SPECPATH).parent / "LICENSE"), "."))
 
 # Qt ships a great deal that a 2D scene graph never touches. Excluding it keeps the
 # download to something a student will actually wait for.

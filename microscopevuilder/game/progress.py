@@ -1,3 +1,15 @@
+# Copyright (c) 2026, Creighton University
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# DISCLAIMER: This software is provided "AS IS", without warranty or guarantee
+# of any kind, express or implied, including but not limited to merchantability,
+# fitness for a particular purpose, accuracy, and non-infringement. It is NOT FIT
+# FOR ANY PURPOSE, STATED OR IMPLIED. It is a simplified educational model, not
+# intended for clinical, diagnostic, or regulatory use or for the operation of
+# any real instrument; its results may be wrong and must be independently
+# verified. In no event shall Creighton University or the contributors be liable
+# for any claim, damages, or other liability arising from its use. See LICENSE.
+
 """Player progress, saved where the operating system says user data belongs.
 
 `platformdirs` was a declared dependency that nothing imported: benches
@@ -16,6 +28,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from platformdirs import user_config_path
+
+from .. import DISCLAIMER
 
 APP_NAME = "MicroscopeVuilder"
 SAVE_VERSION = 2
@@ -151,7 +165,8 @@ class Progress:
         # Write to a sibling and rename, so an interrupted save cannot leave a
         # truncated file where the player's progress used to be.
         scratch = target.with_suffix(".tmp")
-        scratch.write_text(json.dumps(self.to_dict(), indent=2), encoding="utf-8")
+        data = {"_disclaimer": DISCLAIMER, **self.to_dict()}
+        scratch.write_text(json.dumps(data, indent=2), encoding="utf-8")
         scratch.replace(target)
         return target
 
