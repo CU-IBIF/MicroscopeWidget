@@ -1,3 +1,15 @@
+# Copyright (c) 2026, Creighton University
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# DISCLAIMER: This software is provided "AS IS", without warranty or guarantee
+# of any kind, express or implied, including but not limited to merchantability,
+# fitness for a particular purpose, accuracy, and non-infringement. It is NOT FIT
+# FOR ANY PURPOSE, STATED OR IMPLIED. It is a simplified educational model, not
+# intended for clinical, diagnostic, or regulatory use or for the operation of
+# any real instrument; its results may be wrong and must be independently
+# verified. In no event shall Creighton University or the contributors be liable
+# for any claim, damages, or other liability arising from its use. See LICENSE.
+
 """M9: the things that break only once the app is frozen."""
 
 import sys
@@ -212,3 +224,30 @@ def test_pyside_is_not_a_release_that_aborts_on_setpen():
         f"PySide6 {pyside6.__version__} is excluded in pyproject.toml because "
         "QGraphicsLineItem.setPen aborts the interpreter"
     )
+
+
+def test_saved_files_lead_with_the_disclaimer(tmp_path):
+    import json
+
+    from microscopevuilder import DISCLAIMER
+    from microscopevuilder.game.progress import Progress
+    from microscopevuilder.game.rounds import get_round
+
+    bench_path = tmp_path / "bench.json"
+    bench = get_round(1).reference_build()
+    bench.save(bench_path)
+    data = json.loads(bench_path.read_text(encoding="utf-8"))
+    assert next(iter(data)) == "_disclaimer" and data["_disclaimer"] == DISCLAIMER
+    assert type(bench).load(bench_path).to_dict() == bench.to_dict()
+
+    progress_path = tmp_path / "progress.json"
+    Progress().save(progress_path)
+    data = json.loads(progress_path.read_text(encoding="utf-8"))
+    assert next(iter(data)) == "_disclaimer"
+    assert Progress.load(progress_path).to_dict() == Progress().to_dict()
+
+
+def test_license_ships_with_the_binary():
+    assert "NOT FIT FOR ANY PURPOSE" in (REPO / "LICENSE").read_text(encoding="utf-8")
+    spec = (REPO / "packaging" / "microscopevuilder.spec").read_text(encoding="utf-8")
+    assert '"LICENSE"' in spec
